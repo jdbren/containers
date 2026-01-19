@@ -3,7 +3,7 @@
  * @author Jackson Brenneman
  * @brief Singly linked list template class
  * @date 2023-11-5
- * 
+ *
  */
 
 #ifndef _FORWARD_LIST_H_
@@ -19,7 +19,7 @@ using std::istream;
 using std::ostream;
 
 template <typename T>
-struct Node 
+struct Node
 {
     T data;
     Node *next;
@@ -33,18 +33,18 @@ struct Node
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *               ForwardList Class Declaration
- * 
+ *
  *            Singly linked list w/ iterator
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 template <typename T>
-class ForwardList 
+class ForwardList
 {
     template <typename val_type = T, typename ptr_type = Node<T>*>
     class List_Iterator;
 
-    Node<T> *head;
-    size_t _size;
+    Node<T> *head = NULL;
+    size_t _size = 0;
 
 public:
     typedef List_Iterator<T, Node<T>*> iterator;
@@ -71,7 +71,7 @@ public:
 
     bool empty() const noexcept { return head == NULL; }
     size_t size() const noexcept { return _size; }
-    
+
     void clear() noexcept;
     iterator insert_after(const_iterator, const T&);
     iterator insert_after(const_iterator, T&&);
@@ -84,7 +84,7 @@ public:
 
 private:
     template <typename val_type, typename ptr_type>
-    class List_Iterator 
+    class List_Iterator
     {
     public:
         List_Iterator(ptr_type ptr) { current = ptr; }
@@ -96,7 +96,7 @@ private:
 
         List_Iterator operator++() { current = current->next; return *this; }
 
-        bool operator==(const List_Iterator &rhs) const noexcept 
+        bool operator==(const List_Iterator &rhs) const noexcept
             { return this->current == rhs.current; }
         bool operator!=(const List_Iterator &rhs) const noexcept
             { return !(*this == rhs); }
@@ -112,7 +112,7 @@ public:
 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *             ForwardList Class Definitions               *  
+ *             ForwardList Class Definitions               *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 // Default constructor
@@ -138,7 +138,7 @@ ForwardList<T>::ForwardList(const ForwardList& rhs) {
     }
 }
 
-/** 
+/**
  * List Destructor
  * Calls the clear method for list deletion
  */
@@ -151,11 +151,11 @@ ForwardList<T>::~ForwardList() {
 // Overloaded assignment copy
 template <typename T>
 ForwardList<T>& ForwardList<T>::operator=(const ForwardList& rhs) {
-    if(this == &rhs) 
+    if(this == &rhs)
         return *this;
     else if(!empty())
         clear();
-    
+
     auto itr = rhs.cbegin();
     while(itr != rhs.cend()) {
         push_front(*itr);
@@ -168,7 +168,7 @@ ForwardList<T>& ForwardList<T>::operator=(const ForwardList& rhs) {
 // Deletes all nodes in list
 template <typename T>
 void ForwardList<T>::clear() noexcept {
-    if(empty()) 
+    if(empty())
         return;
 
     Node<T> *ptr = head;
@@ -183,7 +183,7 @@ void ForwardList<T>::clear() noexcept {
 
 // Inserts new node after node pointed to by itr
 template <typename T>
-typename ForwardList<T>::iterator 
+typename ForwardList<T>::iterator
 ForwardList<T>::insert_after(const_iterator itr, const T& info) {
     auto newNode = new Node<T>(info, itr.current->next);
     itr.current->next = newNode;

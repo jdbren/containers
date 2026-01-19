@@ -14,6 +14,7 @@
 #include <stdexcept>
 #include <functional>
 #include <utility>
+#include <cmath>
 
 #include "ForwardList.h"
 #include "Vector.h"
@@ -78,8 +79,8 @@ class UnorderedMap
 
     Vector<ForwardList<pair>> A;
     Hash h;
-    size_t currentSize;
-    float _max_load_factor;
+    size_t currentSize = 0;
+    float _max_load_factor = 1.0;
 
 public:
     typedef typename ForwardList<pair>::iterator local_iterator;
@@ -132,7 +133,7 @@ public:
     const_local_iterator cend(size_t n) const { return A[n].cend(); }
     size_t bucket_count() const { return A.size(); }
     size_t bucket_size(size_t n) const { return A[n].size(); }
-    size_t bucket(const Key& k) const { return h(k, bucket_count()); }
+    size_t bucket(const Key& k) const { return h(k) % bucket_count(); }
 
     float load_factor() const { return (float)currentSize / (float)bucket_count(); }
     float max_load_factor() const { return _max_load_factor; }
@@ -193,7 +194,7 @@ private:
     public:
         const_map_iterator() : bucket(nullptr), pos(nullptr) {}
         const_map_iterator(const map_iterator &it)
-            : bucket(it.bucket), pos(it.pos), ref(it.ret) {}
+            : bucket(it.bucket), pos(it.pos), ref(it.ref) {}
 
         const pair& operator*() { return *pos; }
         const pair* operator->() { return &(*pos); }
@@ -276,7 +277,6 @@ auto UnorderedMap<Key,T,H>::insert(const pair& p) -> Pair<iterator, bool> {
     auto itr = A[index].begin();
     if(count(p.first) > 0) {
         while(itr->first != p.first) {
-            ret = false;
             ++itr;
         }
     }
@@ -300,7 +300,6 @@ auto UnorderedMap<Key,T,H>::insert(pair&& p) -> Pair<iterator, bool> {
     auto itr = A[index].begin();
     if(count(p.first) > 0) {
         while(itr->first != p.first) {
-            ret = false;
             ++itr;
         }
     }
@@ -346,9 +345,9 @@ T& UnorderedMap<Key,T,H>::operator[](const Key& k) {
 // Return iterator to key if found, else end()
 template <typename Key, typename T, typename H>
 auto UnorderedMap<Key,T,H>::find(const Key& k) -> iterator {
-    size_t index = h(k, bucket_count());
+    size_t index = h(k) % bucket_count();
     auto itr = begin(index);
-    do{
+    do {
         if(itr->first == k)
             break;
         ++itr;
@@ -374,8 +373,10 @@ auto UnorderedMap<Key,T,H>::find(const Key& k) const -> const_iterator {
 // Rehash to new size n, n > currentSize / max_load_factor()
 template <typename Key, typename T, typename H>
 void UnorderedMap<Key,T,H>::rehash(size_t n) {
+    if(n == 0) n = 1;
     while(n < currentSize / max_load_factor())
         n = (size_t)(currentSize / max_load_factor() * 2);
+
     Vector<ForwardList<pair>> temp(nextPrime(n));
     for(size_t i = 0; i < A.size(); i++){
         auto itr = A[i].begin();
@@ -391,6 +392,7 @@ void UnorderedMap<Key,T,H>::rehash(size_t n) {
 // Return next prime number after num
 template <typename Key, typename T, typename H>
 size_t UnorderedMap<Key,T,H>::nextPrime(size_t num) {
+    if(num <= 1) return 2;
     bool isPrime = false;
     while(!isPrime){
         isPrime = true;

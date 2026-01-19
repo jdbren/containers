@@ -3,7 +3,7 @@
  * @author Jackson Brenneman
  * @brief Resizable array class template
  * @date 2023-11-5
- * 
+ *
  */
 
 #ifndef _VECTOR_H_
@@ -17,27 +17,27 @@ using std::endl;
 using std::out_of_range;
 
 /* * * * * * * * * * * * * * * * * * * * * * * * *
- * 
+ *
  *          Vector Class Declaration
- * 
+ *
  *   Resizeable array similar to std::vector
- * 
+ *
  * * * * * * * * * * * * * * * * * * * * * * * * */
 
 template <typename T>
-class Vector 
+class Vector
 {
-    template <typename val_type, typename ptr_type = val_type*> 
+    template <typename val_type, typename ptr_type = val_type*>
     class Iterator;
 
-    T *_data;
-    size_t currentSize;
-    size_t currentCapacity;
+    T *_data = nullptr;
+    size_t currentSize = 0;
+    size_t currentCapacity = 0;
 
 public:
     typedef Iterator<T> iterator;
     typedef Iterator<const T> const_iterator;
-    
+
     Vector() = default;
     Vector(const size_t, const T& = T());
     Vector(const Vector&);
@@ -83,9 +83,9 @@ public:
     void pop_back();
     void resize(size_t, const T& = T());
 
-    bool operator==(const Vector& rhs) const noexcept 
+    bool operator==(const Vector& rhs) const noexcept
         { return _data == rhs._data;}
-    bool operator!=(const Vector& rhs) const noexcept 
+    bool operator!=(const Vector& rhs) const noexcept
         { return !(*this == rhs); }
 
 private:
@@ -93,7 +93,7 @@ private:
     iterator make_iterator(T *ptr) { return iterator(ptr); }
 
     template <typename val_type, typename ptr_type>
-    class Iterator 
+    class Iterator
     {
     public:
         Iterator() { current = NULL; }
@@ -129,8 +129,8 @@ public:
 
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
-*               Vector Class Definitions                 *      
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+*               Vector Class Definitions                 *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 // Constructor
@@ -213,7 +213,7 @@ T& Vector<T>::at(const size_t index) {
         throw out_of_range("ERROR: invalid index in at method");
 
     return _data[index];
-} 
+}
 
 // const element access with bounds checking
 template <typename T>
@@ -222,7 +222,7 @@ const T& Vector<T>::at(const size_t index) const {
         throw out_of_range("ERROR: invalid index in at method");
 
     return _data[index];
-} 
+}
 
 // Shrinks vector capacity to current size
 template <typename T>
@@ -240,11 +240,11 @@ void Vector<T>::shrink_to_fit(){
 
 // Inserts element at iterator position
 template <typename T>
-typename Vector<T>::iterator 
+typename Vector<T>::iterator
 Vector<T>::insert(const_iterator pos, const T& value) {
     if(currentSize == currentCapacity)
         increaseCapacity(2*currentCapacity);
-    
+
     T *end = const_cast<T*>(&(*pos));
     end--;
     T *ptr = _data + currentSize - 1;
@@ -264,7 +264,7 @@ typename Vector<T>::iterator
 Vector<T>::insert(const_iterator pos, T&& value) {
     if(currentSize == currentCapacity)
         increaseCapacity(2*currentCapacity);
-    
+
     T *end = const_cast<T*>(&(*pos));
     end--;
     T *ptr = _data + currentSize - 1;
@@ -280,14 +280,14 @@ Vector<T>::insert(const_iterator pos, T&& value) {
 
 // Erases element at iterator position
 template <typename T>
-typename Vector<T>::iterator 
+typename Vector<T>::iterator
 Vector<T>::erase(const_iterator pos) {
     T* ptr = const_cast<T*>(&(*pos));
     bool isLast = false;
     T* ret = nullptr;
     if(ptr != &back())
         ret = &ptr[0];
-    else 
+    else
         isLast = true;
     T* end = &back();
     while (ptr != end){
@@ -298,7 +298,7 @@ Vector<T>::erase(const_iterator pos) {
 
     if(!isLast)
         return make_iterator(ret);
-    else 
+    else
         return this->end();
 }
 
